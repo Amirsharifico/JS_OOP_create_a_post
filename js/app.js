@@ -1,4 +1,4 @@
-//AAAAAAAAAAAAA
+
 class Post {
     constructor(title, author, body){
         this.title=title;
@@ -26,7 +26,39 @@ class UI{
         `;
 
         list.appendChild(row)
+    }
 
+    showAlert(message, className) {
+
+        // Create div
+        const div = document.createElement('div');
+    
+        // Add classes
+        div.className = `alert alert-${className}`;
+    
+        // Add text
+        div.appendChild(document.createTextNode(message));
+    
+        // Get parent
+        const col = document.querySelector('.col-sm-8');
+    
+        // Get form
+        const form = document.querySelector('#post-form');
+    
+        // Insert alert
+        col.insertBefore(div, form);
+    
+        // Timeout after 3 sec
+        setTimeout(function(){
+          document.querySelector('.alert').remove();
+        }, 3000);
+    
+      }
+
+    clearFields(){
+        document.getElementById('title').value='';
+        document.getElementById('author').value='';
+        document.getElementById('body').value='';
     }
 
 }
@@ -41,14 +73,23 @@ document.getElementById("post-form").addEventListener("submit", function(e){
     // post initiation
     const post = new Post(title, author,body)
 
-    console.log(post)
-
     //Instatntiate UI
     const ui = new UI();
 
-    // add post to list
+  // Validate
+  if(title === '' || author === '' || body === '') {
+    // Error alert
+    ui.showAlert('All fields are required', 'danger');
+  } else {
+    // Add post to list
     ui.addPostToList(post);
 
+    // Show success
+    ui.showAlert('Post added', 'success');
+
+    // Clear fields
+    ui.clearFields();
+  }
 
     e.preventDefault();
 })
