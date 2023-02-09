@@ -61,6 +61,55 @@ class UI {
   }
 }
 
+// Local Storage Class
+class Store {
+  static getPosts() {
+    let posts;
+    if (localStorage.getItem("posts") === null) {
+      posts = [];
+    } else {
+      posts = JSON.parse(localStorage.getItem("posts"));
+    }
+
+    return posts;
+  }
+
+  static displayPosts() {
+    const posts = Store.getPosts();
+
+    posts.forEach(function (post) {
+      const ui = new UI();
+
+      // Add book to UI
+      ui.addPostToList(post);
+    });
+  }
+
+  static addPost(post) {
+    const posts = Store.getPosts();
+
+    posts.push(post);
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+  }
+
+  static removePost(title) {
+    const posts = Store.getPosts();
+
+    posts.forEach(function (post, index) {
+      if (post.title === title) {
+        posts.splice(index, 1);
+      }
+    });
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+  }
+}
+
+// DOM Load Event
+document.addEventListener("DOMContentLoaded", Store.displayPosts);
+
+// Event Listener for add post
 document.getElementById("post-form").addEventListener("submit", function (e) {
   //Get Form values
   const title = document.getElementById("title").value;
@@ -80,6 +129,8 @@ document.getElementById("post-form").addEventListener("submit", function (e) {
   } else {
     // Add post to list
     ui.addPostToList(post);
+    // Add to LS
+    Store.addPost(post);
 
     // Show success
     ui.showAlert("Post added", "success");
@@ -99,6 +150,12 @@ document.getElementById("post-list").addEventListener("click", function (e) {
   if (e.target.classList.contains("delete")) {
     // Delete book
     ui.deletePost(e.target);
+
+    // Remove from local storage
+    const tr = e.target.parentElement.parentElement;
+    const title = tr.firstElementChild.textContent;
+
+    Store.removePost(title);
 
     // Show message
     ui.showAlert("Post Deleted", "success");
